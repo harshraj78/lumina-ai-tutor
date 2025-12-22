@@ -3,7 +3,8 @@ package com.lumina.api.controller;
 import com.lumina.api.model.Document;
 import com.lumina.api.repository.DocumentRepository;
 import com.lumina.api.service.FileStorageService;
-import com.lumina.api.service.PdfService; // Import the new service
+import com.lumina.api.service.PdfService;
+import com.lumina.api.service.AiTutorService; // Import the AI service
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,28 +16,28 @@ public class DocumentController {
 
     private final FileStorageService storageService;
     private final DocumentRepository documentRepository;
-    private final PdfService pdfService; // Inject the PDF reader
+    private final PdfService pdfService;
+    private final AiTutorService aiTutorService; // Add this line
 
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-        // 1. Save the file physically
+        // 1. Save the file physically in 'lumina-uploads'
         String finalPath = storageService.saveFile(file);
 
-        // 2. Save the metadata to PostgreSQL
+        // 2. Save metadata to PostgreSQL
         Document doc = new Document();
         doc.setFileName(file.getOriginalFilename());
         doc.setFilePath(finalPath);
         doc.setContentType(file.getContentType());
         documentRepository.save(doc);
 
-        // 3. READ THE TEXT (The new part!)
+        // 3. Extract the text from the PDF
         String extractedText = pdfService.extractText(finalPath);
 
-        // Print it to your console so you can see it
-        System.out.println("--- EXTRACTED TEXT START ---");
-        System.out.println(extractedText);
-        System.out.println("--- EXTRACTED TEXT END ---");
+        // 4. Send that text to your local Ollama AI for a summary
+        String summary = aiTutorService.summarizeLesson(extractedText);
 
-        return "File uploaded and read successfully! Check your IntelliJ console.";
+        // 5. Return the summary to Postman
+        return "UPLOAD SUCCESSFUL!\n\nAI SUMMARY:\n" + summary;
     }
 }
