@@ -1,18 +1,19 @@
 package com.lumina.api.controller;
 
 import com.lumina.api.service.AiTutorService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired; // <-- Fixes 'Autowired'
+import org.springframework.web.bind.annotation.*; // <-- Fixes 'RequestMapping', 'PostMapping', etc.
 
 @RestController
-@RequestMapping("/api/v1/chat")
-@RequiredArgsConstructor
+@RequestMapping("/api/chat")
 public class ChatController {
 
-    private final AiTutorService aiTutorService;
+    @Autowired // This connects the controller to your service
+    private AiTutorService aiTutorService;
 
-    @PostMapping
-    public String chat(@RequestParam String sessionId, @RequestParam String message) {
+    @PostMapping("/ask")
+    public String ask(@RequestParam String sessionId, @RequestBody String message) {
+        // This method receives the request and sends it to the service we fixed earlier
         return aiTutorService.askQuestion(sessionId, message);
     }
 }

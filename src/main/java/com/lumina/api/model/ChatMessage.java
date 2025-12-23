@@ -1,26 +1,23 @@
 package com.lumina.api.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "chat_messages")
-@Getter @Setter @NoArgsConstructor
+@Data
 public class ChatMessage {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    private String sessionId;
+
+    private String role; // "user" or "assistant"
+
+    @Column(columnDefinition = "TEXT") // Allows long AI responses
     private String content;
 
-    private String sender; // "USER" or "AI"
-
-    private LocalDateTime timestamp;
-
-    @ManyToOne
-    @JoinColumn(name = "document_id")
-    private Document document; // Which PDF are we talking about?
+    private LocalDateTime timestamp = LocalDateTime.now();
 }
