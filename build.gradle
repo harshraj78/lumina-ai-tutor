@@ -6,7 +6,6 @@ plugins {
 
 group = 'com.lumina'
 version = '0.0.1-SNAPSHOT'
-description = 'AI embedded Project'
 
 java {
 	toolchain {
@@ -14,42 +13,28 @@ java {
 	}
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
+// Ensure these are defined so GitHub Actions or other devs can find the files
 repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
 }
-// This "BOM" ensures all Spring AI versions match your Spring Boot version
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.ai:spring-ai-bom:1.0.0-M1"
-	}
-}
 
 dependencies {
-	// 1. Changed 'webmvc' to 'web'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-
-	// 2. Fixed these test dependencies as well
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
 	implementation 'org.apache.pdfbox:pdfbox:3.0.0'
 
-	// AI Starter - No version needed here because of the BOM above
-	implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
+	// We use M1 here because it is the most stable milestone for these specific starters
+	implementation 'org.springframework.ai:spring-ai-jdbc-memory-spring-boot-starter:1.0.0-M1'
+	implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter:1.0.0-M1'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
